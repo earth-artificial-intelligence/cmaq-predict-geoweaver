@@ -1,0 +1,21 @@
+[{
+  "history_id" : "xwxSkHiU0RZ3",
+  "history_input" : "#!/bin/bash\nsbatch /groups/ESS/aalnaim/cmaq/cmaq_gpu.slurm",
+  "history_output" : "Submitted batch job 268228\n",
+  "history_begin_time" : 1654536387546,
+  "history_end_time" : null,
+  "history_notes" : null,
+  "history_process" : "rjm4qm",
+  "host_id" : null,
+  "indicator" : "Running"
+},{
+  "history_id" : "0dbnqvd4erk",
+  "history_input" : "#!/bin/bash\nsbatch /groups/ESS/aalnaim/cmaq/cmaq_gpu.slurm",
+  "history_output" : "Submitted batch job 268227\n",
+  "history_begin_time" : 1654535465938,
+  "history_end_time" : 1654535470564,
+  "history_notes" : null,
+  "history_process" : "rjm4qm",
+  "host_id" : "p6wvf2",
+  "indicator" : "Done"
+},]

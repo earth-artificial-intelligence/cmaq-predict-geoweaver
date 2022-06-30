@@ -1,0 +1,51 @@
+[{
+  "history_id" : "gxs47n3fu63",
+  "history_input" : "\n# Importing necessary libraries\nimport pandas as pd\nimport pickle\nfrom pathlib import Path\nfrom time import sleep\n\n# home directory\nhome = str(Path.home())\n# importing data\nfinal=pd.read_csv(\"/groups/ESS/aalnaim/cmaq/testing.csv\")\nprint(final.head())\nX = final.drop(['YYYYMMDDHH','Latitude','Longitude',],axis=1)\n# defining  testing variables\n# processing test data\n\n# load the model from disk\nfilename = '/groups/ESS/aalnaim/cmaq/models/rfOLD_Jun13.sav'\n#filename = 'D:/Research/CMAQ/local_test/xgboost.sav'\nloaded_model = pickle.load(open(filename, 'rb'))\n\n# making prediction\npred = loaded_model.predict(X)\n\n# adding prediction values to test dataset\nfinal['prediction'] = pred.tolist()\n\nfinal = final[['Latitude', 'Longitude','YYYYMMDDHH','prediction']]\n# saving the dataset into local drive\nfinal.to_csv('/groups/ESS/aalnaim/cmaq/prediction_files/prediction_rf.csv',index=False)",
+  "history_output" : "    Latitude   Longitude  YYYYMMDDHH  ...  month  day  hours\n0  21.829086 -120.620790  2022062612  ...      6   26     12\n1  21.855751 -120.512500  2022062612  ...      6   26     12\n2  21.882309 -120.404144  2022062612  ...      6   26     12\n3  21.908745 -120.295715  2022062612  ...      6   26     12\n4  21.935051 -120.187225  2022062612  ...      6   26     12\n\n[5 rows x 18 columns]\n",
+  "history_begin_time" : 1656451082067,
+  "history_end_time" : 1656452485876,
+  "history_notes" : null,
+  "history_process" : "l8vlic",
+  "host_id" : "p6wvf2",
+  "indicator" : "Stopped"
+},{
+  "history_id" : "tyaio8q7nov",
+  "history_input" : null,
+  "history_output" : null,
+  "history_begin_time" : null,
+  "history_end_time" : 1656452485883,
+  "history_notes" : null,
+  "history_process" : "3asyzj",
+  "host_id" : "p6wvf2",
+  "indicator" : "Stopped"
+},{
+  "history_id" : "b52wrb6e5b0",
+  "history_input" : null,
+  "history_output" : null,
+  "history_begin_time" : null,
+  "history_end_time" : 1656452485892,
+  "history_notes" : null,
+  "history_process" : "iicy7w",
+  "host_id" : "p6wvf2",
+  "indicator" : "Stopped"
+},{
+  "history_id" : "7sp4kvy7u51",
+  "history_input" : null,
+  "history_output" : null,
+  "history_begin_time" : null,
+  "history_end_time" : 1656452485898,
+  "history_notes" : null,
+  "history_process" : "is1w3m",
+  "host_id" : "p6wvf2",
+  "indicator" : "Stopped"
+},{
+  "history_id" : "mmqmr29btkk",
+  "history_input" : null,
+  "history_output" : null,
+  "history_begin_time" : null,
+  "history_end_time" : 1656452485903,
+  "history_notes" : null,
+  "history_process" : "is1w3m",
+  "host_id" : "p6wvf2",
+  "indicator" : "Stopped"
+}]

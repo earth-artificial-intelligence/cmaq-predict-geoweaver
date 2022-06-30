@@ -1,0 +1,31 @@
+[{
+  "history_id" : "py4wx8nmbmr",
+  "history_input" : "\n# Importing necessary libraries\nimport pandas as pd\nimport pickle\nfrom pathlib import Path\nfrom time import sleep\n\n# home directory\nhome = str(Path.home())\n# importing data\nfinal=pd.read_csv(home+'/cmaq/testing.csv')\nprint(final.head())\nX = final.drop(['YYYYMMDDHH','Latitude','Longitude',],axis=1)\n# defining  testing variables\n# processing test data\n\n# load the model from disk\nfilename = '/groups/ESS/aalnaim/cmaq/models/rf.sav'\n#filename = 'D:/Research/CMAQ/local_test/xgboost.sav'\nloaded_model = pickle.load(open(filename, 'rb'))\n\n# making prediction\npred = loaded_model.predict(X)\n\n# adding prediction values to test dataset\nfinal['prediction'] = pred.tolist()\n\nfinal = final[['Latitude', 'Longitude','YYYYMMDDHH','prediction']]\n# saving the dataset into local drive\nfinal.to_csv('/groups/ESS/aalnaim/cmaq/prediction_files/prediction_rf.csv',index=False)",
+  "history_output" : "    Latitude   Longitude  YYYYMMDDHH  ...  month  day  hours\n0  21.829086 -120.620790  2022052712  ...      5   27     12\n1  21.855751 -120.512500  2022052712  ...      5   27     12\n2  21.882309 -120.404144  2022052712  ...      5   27     12\n3  21.908745 -120.295715  2022052712  ...      5   27     12\n4  21.935051 -120.187225  2022052712  ...      5   27     12\n\n[5 rows x 18 columns]\n",
+  "history_begin_time" : 1654535473068,
+  "history_end_time" : 1655255389515,
+  "history_notes" : null,
+  "history_process" : "l8vlic",
+  "host_id" : "p6wvf2",
+  "indicator" : "Stopped"
+},{
+  "history_id" : "wn2hbzhu2ay",
+  "history_input" : "echo \"#!/bin/bash\n#SBATCH --partition=gpuq                    # the DGX only belongs in the 'gpu'  partition\n#SBATCH --qos=gpu                           # need to select 'gpu' QoS\n#SBATCH --job-name=cmaq-gpu\n#SBATCH --output=cmaq-gpu.%j.out\n#SBATCH --error=cmaq-gpu.%j.err\n#SBATCH --nodes=1\n#SBATCH --ntasks-per-node=64                 # up to 128;\n#SBATCH --gres=gpu:A100.40gb:4              # up to 8; only request what you need\n#SBATCH --mem-per-cpu=3500M                 # memory per CORE; total memory is 1 TB (1,000,000 MB)\n#SBATCH --export=ALL\n#SBATCH --time=0-04:00:00                   # set to 1hr; please choose carefully\nset echo\numask 0027\n# to see ID and state of GPUs assigned\nnvidia-smi\n\nmodule load python\nsource /home/aalnaim/CMAQAI/bin/activate\n\ncat <<EOF >>/groups/ESS/aalnaim/cmaq/rf_pyCaret.py\n# Write first python in Geoweaver# NASA GEOWEAVER\n# CMAQ-AI Model: Training Voting-XGBoost model\n\n# Importing necessary libraries\nimport pandas as pd\nimport sklearn\nfrom sklearn.ensemble import RandomForestRegressor\nfrom xgboost.sklearn import XGBRegressor\nimport pickle\nfrom pathlib import Path\n\n# home directory\nhome = str(Path.home())\n\n# importing data\nfinal=pd.read_csv('/groups/ESS/mislam25/processed_training/agg_data_2021_03_15_to_22_4_30.csv')\nprint(final.head())\nfinal=final.dropna()\n\n# Processing training  data\nX = final.drop(['AirNOW_O3','Latitude_x','Longitude_x'],axis=1)\ny = final['AirNOW_O3']\n\nrf = RandomForestRegressor(bootstrap=True, ccp_alpha=0.0, criterion='mse',\n                      max_depth=None, max_features='auto', max_leaf_nodes=None,\n                      max_samples=None, min_impurity_decrease=0.0,\n                      min_samples_leaf=1,\n                      min_samples_split=2, min_weight_fraction_leaf=0.0,\n                      n_estimators=100, n_jobs=-1, oob_score=False,\n                      random_state=3086, verbose=0, warm_start=False)\n\n#rf.fit(X, y)\n\n# save the model to disk\nfilename = '/groups/ESS/aalnaim/cmaq/models/rf.sav'\n#filename = 'D:/Research/CMAQ/local_test/xgboost.sav'\n#pickle.dump(rf, open(filename, 'wb'))\nprint(\"IT WORKED\")\nEOF\npython /groups/ESS/aalnaim/cmaq/rf_pyCaret.py\" >> /groups/ESS/aalnaim/cmaq/cmaq_gpu.slurm\n\n",
+  "history_output" : "Running",
+  "history_begin_time" : 1654535458975,
+  "history_end_time" : 1654535464146,
+  "history_notes" : null,
+  "history_process" : "wny2dz",
+  "host_id" : "p6wvf2",
+  "indicator" : "Done"
+},{
+  "history_id" : "0dbnqvd4erk",
+  "history_input" : "#!/bin/bash\nsbatch /groups/ESS/aalnaim/cmaq/cmaq_gpu.slurm",
+  "history_output" : "Submitted batch job 268227\n",
+  "history_begin_time" : 1654535465938,
+  "history_end_time" : 1654535470564,
+  "history_notes" : null,
+  "history_process" : "rjm4qm",
+  "host_id" : "p6wvf2",
+  "indicator" : "Done"
+}]
