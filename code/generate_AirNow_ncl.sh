@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Setting env variables
-export YYYYMMDD_POST=$(date -d '3 day ago' '+%Y%m%d')
+# export YYYYMMDD_POST=$(date -d '3 day ago' '+%Y%m%d')
 export stdate_post=$(date -d '3 day ago' '+%Y-%m-%d') 
 export eddate_post=$(date -d '2 day ago' '+%Y-%m-%d')
 
@@ -25,7 +25,10 @@ end setvalues
 
 begin
 
-date = getenv("YYYYMMDD_POST") 
+;date = getenv("YYYYMMDD_POST")
+date = autoDate
+gridDate = gridDate
+hour = hour
 d1 = getenv("stdate_post") 
 d2 = getenv("eddate_post") 
 
@@ -39,9 +42,9 @@ print(plot_dir)
 aconc_dir = getenv("postdata_dir") 
 grid_dir = getenv("mcip_dir") 
 
-cdf_file1 = addfile(aconc_dir+"/COMBINE3D_ACONC_v531_gcc_AQF5X_"+date+"_ML_extracted.nc","r")
-cdf_file= addfile(grid_dir+"/GRIDCRO2D_"+date+".nc","r")
-cdf_file2= addfile(grid_dir+"/METCRO2D_"+date+".nc","r")
+cdf_file1 = addfile(aconc_dir+"/COMBINE3D_ACONC_v531_gcc_AQF5X_"+date+"_Hourly_ML_extracted.nc","r")
+cdf_file= addfile(grid_dir+"/GRIDCRO2D_"+gridDate+".nc","r")
+cdf_file2= addfile(grid_dir+"/METCRO2D_"+gridDate+".nc","r")
 
 time = cdf_file1->TFLAG(:,0,:)
 o3 = cdf_file1->O3(:,:,:) ;ppb
@@ -307,10 +310,17 @@ delete(res)
 end
 EOF
 
+for i in {0..23};   
+do  
+	date=$(date -d '3 day ago' '+%Y%m%d');  
+	export YYYYMMDD_POST=($date$i); 
+    echo $YYYYMMDD_POST;
+    ncl autoDate=$YYYYMMDD_POST gridDate=$date hour=$i /groups/ESS/aalnaim/cmaq/geoweaver_plot_daily_O3_Airnow.ncl
+done;
 
-ncl /groups/ESS/aalnaim/cmaq/geoweaver_plot_daily_O3_Airnow.ncl
+# ncl /groups/ESS/aalnaim/cmaq/geoweaver_plot_daily_O3_Airnow.ncl
 
-convert -delay 100 /groups/ESS/aalnaim/cmaq/plots/OBS*.png /groups/ESS/aalnaim/cmaq/plots/"Airnow_"$YYYYMMDD_POST.gif
+# convert -delay 100 /groups/ESS/aalnaim/cmaq/plots/OBS*.png /groups/ESS/aalnaim/cmaq/plots/"Airnow_"$YYYYMMDD_POST.gif
 
 if [ $? -eq 0 ]; then
     echo "Generating AirNow images/gif Completed Successfully"

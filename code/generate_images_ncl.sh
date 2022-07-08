@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Setting env variables
-export YYYYMMDD_POST=$(date -d '3 day ago' '+%Y%m%d') #This needs to be auto date `date -d "-2 day ${1}" +%Y%m%d`
+# export YYYYMMDD_POST=$(date -d '2 day ago' '+%Y%m%d') #This needs to be auto date `date -d "-2 day ${1}" +%Y%m%d`
 export stdate_post=$(date -d '3 day ago' '+%Y-%m-%d') #This needs to be auto date
 export eddate_post=$(date -d '2 day ago' '+%Y-%m-%d') #This needs to be auto date
 
@@ -22,18 +22,21 @@ end setvalues
 
 begin
 
-date = getenv("YYYYMMDD_POST")
+;date = getenv("YYYYMMDD_POST")
+date = autoDate
+gridDate = gridDate
+hour = hour
 d1 = getenv("stdate_post")
 d2 = getenv("eddate_post")
 
-;print("Passed Date: "+date)
+print("Passed Date: "+date)
 
 ;aconc_dir = getenv("postdata_dir")
 grid_dir = getenv("mcip_dir")
 plot_dir = getenv("dir_graph")
 
-cdf_file1 = addfile("/groups/ESS/aalnaim/cmaq/prediction_nc_files/COMBINE3D_ACONC_v531_gcc_AQF5X_"+date+"_ML_extracted.nc","r")
-cdf_file= addfile(grid_dir+"/GRIDCRO2D_"+date+".nc","r")
+cdf_file1 = addfile("/groups/ESS/aalnaim/cmaq/prediction_nc_files/COMBINE3D_ACONC_v531_gcc_AQF5X_"+date+"_Hourly_ML_extracted.nc","r")
+cdf_file= addfile(grid_dir+"/GRIDCRO2D_"+gridDate+".nc","r")
 
 ptime = (/"12","13","14","15","16","17","18","19","20","21","22","23","00","01","02","03","04","05","06","07","08","09","10","11"/)
 
@@ -137,11 +140,12 @@ do it = 0, nt-1
     pdate=d2
   end if
 
-  pname=plot_dir+"/testPlot_"+pdate+"_"+ptime(it)
+  pname=plot_dir+"/testPlot_"+pdate+"_"+hour
+  print("File name being saved: "+pname)
   wks = gsn_open_wks("png",pname)
   gsn_define_colormap(wks, "WhiteBlueGreenYellowRed")
 
-  res@tiMainString = pdate+" "+ptime(it)+" UTC O~B~3~N~ Forecast (ppbV)"
+  res@tiMainString = pdate+" "+hour+" UTC O~B~3~N~ Forecast (ppbV)"
   plot = gsn_csm_contour_map(wks,o3(it,:,:),res)
   draw(plot)
   frame(wks)
@@ -153,11 +157,18 @@ delete(res)
 end
 EOF
 
+for i in {0..23};   
+do  
+	date=$(date -d '3 day ago' '+%Y%m%d');  
+	export YYYYMMDD_POST=($date$i); 
+    echo $YYYYMMDD_POST;
+    ncl autoDate=$YYYYMMDD_POST gridDate=$date hour=$i /groups/ESS/aalnaim/cmaq/geoweaver_plot_daily_O3.ncl
+done;
 
-ncl /groups/ESS/aalnaim/cmaq/geoweaver_plot_daily_O3.ncl
+# ncl /groups/ESS/aalnaim/cmaq/geoweaver_plot_daily_O3.ncl
 
 # convert -delay 100 *.png 20220613_20220614.gif
-convert -delay 100 /groups/ESS/aalnaim/cmaq/plots/testPlot*.png /groups/ESS/aalnaim/cmaq/plots/"Map_"$YYYYMMDD_POST.gif
+# convert -delay 100 /groups/ESS/aalnaim/cmaq/plots/testPlot*.png /groups/ESS/aalnaim/cmaq/plots/"Map_"$YYYYMMDD_POST.gif
 
 if [ $? -eq 0 ]; then
     echo "Generating images/gif Completed Successfully"
